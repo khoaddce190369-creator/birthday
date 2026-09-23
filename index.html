@@ -633,8 +633,8 @@
   <div class="toast" id="toast"></div>
   <!-- ===== MUSIC TOGGLE ===== -->
   <button class="music-toggle" id="music-toggle" onclick="toggleMusic()">🎵</button>
-  <!-- ===== YOUTUBE (HIDDEN) ===== -->
-  <div id="yt-wrapper"><div id="yt-player"></div></div>
+  <!-- ===== AUDIO ===== -->
+  <audio id="bg-music" loop src="assets/music.mp3"></audio>
 
   <!-- ===== JAVASCRIPT ===== -->
   <script>
@@ -828,35 +828,26 @@
     }
 
     // ================================================================
-    // YOUTUBE MUSIC (Direct iframe - works on file:// and http://)
+    // AUDIO MUSIC
     // ================================================================
     function playMusic() {
-      const wrapper = document.getElementById('yt-wrapper');
-      wrapper.style.cssText = `
-        position:fixed; bottom:62px; right:15px;
-        width:260px; height:52px; z-index:1500;
-        border-radius:6px; overflow:hidden;
-        border:1px solid rgba(0,255,65,0.3);
-        box-shadow:0 0 15px rgba(0,255,65,0.1);
-        opacity:1; pointer-events:auto;
-      `;
-      wrapper.innerHTML = `<iframe
-        src="https://www.youtube.com/embed/${CONFIG.ytId}?autoplay=1&loop=1&playlist=${CONFIG.ytId}"
-        allow="autoplay; encrypted-media" frameborder="0"
-        style="width:260px;height:160px;margin-top:-54px"></iframe>`;
+      const audio = document.getElementById('bg-music');
+      audio.play().catch(e => console.log('Autoplay prevented:', e));
       S.musicOn = true;
       updateMusicBtn();
     }
+    function pauseMusic() {
+      const audio = document.getElementById('bg-music');
+      audio.pause();
+      S.musicOn = false;
+      updateMusicBtn();
+    }
     function toggleMusic() {
-      const wrapper = document.getElementById('yt-wrapper');
       if (S.musicOn) {
-        wrapper.innerHTML = '';
-        wrapper.style.cssText = 'position:fixed;bottom:-200px;left:-200px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;';
-        S.musicOn = false;
+        pauseMusic();
       } else {
         playMusic();
       }
-      updateMusicBtn();
     }
     function updateMusicBtn() {
       const b = document.getElementById('music-toggle');
