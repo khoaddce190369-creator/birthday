@@ -18,3 +18,4 @@ Website chúc mừng sinh nhật với hiệu ứng bất ngờ.
 - Thay `assets/qrcode.png` bằng ảnh QR code thực tế
 - Thay `assets/video.mp4` bằng video thực tế
 - Chỉnh lời chúc trong `index.html` → biến `CONFIG.wishMessage`
+"# birthday" 
