@@ -577,44 +577,18 @@
     </div>
   </div>
 
-  <!-- ===== MODAL 6 - QR CODE ===== -->
+  <!-- ===== MODAL 6 - VIDEO ===== -->
   <div class="modal-overlay" id="modal-6">
-    <canvas class="modal-effects-canvas" id="money-canvas"></canvas>
-    <div class="modal-terminal">
-      <div class="modal-term-header">
-        <div class="modal-term-header-left">
-          <div class="terminal-dots"><span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span></div>
-          <span class="modal-term-title">transfer_funds.sh</span>
-        </div>
-        <button class="modal-close" onclick="closeModal(6)">✕</button>
-      </div>
-      <div class="modal-term-body">
-        <div class="decrypt-status" id="decrypt-status-6"></div>
-        <div class="qr-section">
-          <div class="qr-label">💰 FUND TRANSFER</div>
-          <div class="qr-sublabel">// Quà nhỏ gửi đến bạn</div>
-          <div class="qr-frame">
-            <img src="assets/qrcode.png" alt="QR Code" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <div class="qr-placeholder" style="display:none">📱 Thay QR code<br>vào assets/qrcode.png</div>
-          </div>
-          <div class="qr-note"><span>> </span>Quét mã QR để nhận quà 🤑</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL 9 - VIDEO ===== -->
-  <div class="modal-overlay" id="modal-9">
     <div class="modal-terminal" style="max-width:750px">
       <div class="modal-term-header">
         <div class="modal-term-header-left">
           <div class="terminal-dots"><span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span></div>
           <span class="modal-term-title">play_secret_video.sh</span>
         </div>
-        <button class="modal-close" onclick="closeModal(9)">✕</button>
+        <button class="modal-close" onclick="closeModal(6)">✕</button>
       </div>
       <div class="modal-term-body">
-        <div class="decrypt-status" id="decrypt-status-9"></div>
+        <div class="decrypt-status" id="decrypt-status-6"></div>
         <div class="video-section">
           <div class="video-label">🎬 SECRET FILE</div>
           <div class="video-sublabel">// Dành riêng cho bạn</div>
@@ -624,6 +598,32 @@
             </video>
             <div class="video-placeholder" id="video-placeholder">🎬 Thay video vào assets/video.mp4</div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL 9 - QR CODE ===== -->
+  <div class="modal-overlay" id="modal-9">
+    <canvas class="modal-effects-canvas" id="money-canvas"></canvas>
+    <div class="modal-terminal">
+      <div class="modal-term-header">
+        <div class="modal-term-header-left">
+          <div class="terminal-dots"><span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span></div>
+          <span class="modal-term-title">transfer_funds.sh</span>
+        </div>
+        <button class="modal-close" onclick="closeModal(9)">✕</button>
+      </div>
+      <div class="modal-term-body">
+        <div class="decrypt-status" id="decrypt-status-9"></div>
+        <div class="qr-section">
+          <div class="qr-label">💰 FUND TRANSFER</div>
+          <div class="qr-sublabel">// Quà nhỏ gửi đến bạn</div>
+          <div class="qr-frame">
+            <img src="assets/qrcode.png" alt="QR Code" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="qr-placeholder" style="display:none">📱 Thay QR code<br>vào assets/qrcode.png</div>
+          </div>
+          <div class="qr-note"><span>> </span>Quét mã QR để nhận quà 🤑</div>
         </div>
       </div>
     </div>
@@ -828,27 +828,36 @@
     }
 
     // ================================================================
-    // YOUTUBE MUSIC
+    // YOUTUBE MUSIC (Direct iframe - works on file:// and http://)
     // ================================================================
-    function loadYT() {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(tag);
+    function playMusic() {
+      const wrapper = document.getElementById('yt-wrapper');
+      wrapper.style.cssText = `
+        position:fixed; bottom:62px; right:15px;
+        width:260px; height:52px; z-index:1500;
+        border-radius:6px; overflow:hidden;
+        border:1px solid rgba(0,255,65,0.3);
+        box-shadow:0 0 15px rgba(0,255,65,0.1);
+        opacity:1; pointer-events:auto;
+      `;
+      wrapper.innerHTML = `<iframe
+        src="https://www.youtube.com/embed/${CONFIG.ytId}?autoplay=1&loop=1&playlist=${CONFIG.ytId}"
+        allow="autoplay; encrypted-media" frameborder="0"
+        style="width:260px;height:160px;margin-top:-54px"></iframe>`;
+      S.musicOn = true;
+      updateMusicBtn();
     }
-    window.onYouTubeIframeAPIReady = () => {
-      S.ytPlayer = new YT.Player('yt-player', {
-        height: '1', width: '1',
-        videoId: CONFIG.ytId,
-        playerVars: { autoplay: 0, loop: 1, playlist: CONFIG.ytId, controls: 0 },
-        events: {
-          onReady: () => { S.ytReady = true; },
-          onStateChange: e => { S.musicOn = (e.data === YT.PlayerState.PLAYING); updateMusicBtn(); }
-        }
-      });
-    };
-    function playMusic() { if (S.ytReady && S.ytPlayer) { S.ytPlayer.playVideo(); S.musicOn = true; updateMusicBtn(); } }
-    function pauseMusic() { if (S.ytReady && S.ytPlayer) { S.ytPlayer.pauseVideo(); S.musicOn = false; updateMusicBtn(); } }
-    function toggleMusic() { S.musicOn ? pauseMusic() : playMusic(); }
+    function toggleMusic() {
+      const wrapper = document.getElementById('yt-wrapper');
+      if (S.musicOn) {
+        wrapper.innerHTML = '';
+        wrapper.style.cssText = 'position:fixed;bottom:-200px;left:-200px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;';
+        S.musicOn = false;
+      } else {
+        playMusic();
+      }
+      updateMusicBtn();
+    }
     function updateMusicBtn() {
       const b = document.getElementById('music-toggle');
       b.textContent = S.musicOn ? '🎵' : '🔇';
@@ -1005,24 +1014,27 @@
         await typeWriter(wishEl, CONFIG.wish, 22);
         document.getElementById('wish-footer').style.display = 'block';
       } else if (num === 6) {
-        startMoney();
-        await showDecryptAnim(6, 'transfer_qr.enc');
-      } else if (num === 9) {
-        await showDecryptAnim(9, 'secret_video.enc');
+        await showDecryptAnim(6, 'secret_video.enc');
         const video = document.getElementById('surprise-video');
         video.addEventListener('error', () => {
           document.getElementById('video-placeholder').style.display = 'flex';
         });
         video.play().catch(() => {});
+      } else if (num === 9) {
+        startMoney();
+        await showDecryptAnim(9, 'transfer_qr.enc');
       }
     }
 
     function closeModal(num) {
       document.getElementById('modal-' + num).classList.remove('show');
       if (num === 3) { stopHearts(); S.step = 2; unlockBall(6); }
-      else if (num === 6) { stopMoney(); S.step = 3; unlockBall(9); }
-      else if (num === 9) {
+      else if (num === 6) {
         document.getElementById('surprise-video').pause();
+        S.step = 3; unlockBall(9);
+      }
+      else if (num === 9) {
+        stopMoney();
         S.step = 4;
         showToast('[SYS] All nodes decrypted. Mission complete! 🎉', 5000);
         launchCelebration();
@@ -1119,7 +1131,7 @@
       initMatrix(); initTrail();
       window.addEventListener('resize', () => { initMatrix(); initTrail(); });
       drawMatrix(); animTrail();
-      loadYT(); runBoot();
+      runBoot();
 
       const video = document.getElementById('surprise-video');
       video.addEventListener('canplay', () => {
