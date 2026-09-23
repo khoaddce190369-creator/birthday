@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎂 Happy Birthday - Nguyễn Võ Quốc Thái</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============= RESET & BASE ============= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      overflow: hidden;
+      background: #0a0a2e;
+      font-family: 'Quicksand', sans-serif;
+      color: white;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ============= INTRO SCREEN ============= */
+    #intro-screen {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at center, #1a1a4e 0%, #0a0a2e 70%);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+    }
+    #intro-screen.hide {
+      opacity: 0; transform: scale(1.8);
+      pointer-events: none;
+    }
+    #fireworks-canvas {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; z-index: 0;
+    }
+    .intro-content {
+      position: relative; z-index: 2;
+      text-align: center; padding: 20px;
+    }
+    .intro-emoji {
+      font-size: 80px;
+      opacity: 0;
+      animation: bounceIn 1s ease 0.3s forwards;
+    }
+    .intro-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(36px, 8vw, 70px);
+      background: linear-gradient(45deg, #ff6b9d, #ffd93d, #6bcbff, #ff6b9d);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease infinite;
+      margin: 15px 0;
+      opacity: 0;
+      animation: fadeInUp 1s ease 0.8s forwards, gradientShift 3s ease infinite;
+    }
+    .intro-name {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(28px, 6vw, 52px);
+      color: #ffd93d;
+      text-shadow: 0 0 20px rgba(255,217,61,0.8), 0 0 40px rgba(255,217,61,0.4),
+                   0 0 60px rgba(255,217,61,0.2);
+      opacity: 0;
+      animation: fadeInUp 1s ease 1.5s forwards, glowPulse 2s ease-in-out 2.5s infinite alternate;
+    }
+    .intro-stars {
+      font-size: 30px; margin: 10px 0;
+      opacity: 0;
+      animation: fadeIn 1s ease 2s forwards;
+    }
+    .open-gift-btn {
+      margin-top: 35px; padding: 16px 45px;
+      font-size: clamp(18px, 4vw, 26px);
+      font-family: 'Quicksand', sans-serif; font-weight: 700;
+      border: none; border-radius: 50px;
+      background: linear-gradient(135deg, #ff6b9d, #c44dff);
+      color: white; cursor: pointer;
+      position: relative; overflow: hidden;
+      box-shadow: 0 0 30px rgba(196,77,255,0.5), 0 5px 20px rgba(0,0,0,0.3);
+      opacity: 0;
+      animation: fadeInUp 1s ease 2.5s forwards;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .open-gift-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 50px rgba(196,77,255,0.8), 0 5px 25px rgba(0,0,0,0.4);
+    }
+    .open-gift-btn:active { transform: scale(0.95); }
+    .open-gift-btn::after {
+      content: ''; position: absolute;
+      top: -50%; left: -100%; width: 60%; height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: skewX(-20deg);
+      animation: shimmer 3s infinite 3s;
+    }
+
+    /* ============= CONFETTI (CSS) ============= */
+    .confetti-piece {
+      position: fixed; z-index: 999;
+      width: 10px; height: 10px;
+      opacity: 0;
+      animation: confettiFall linear forwards;
+    }
+
+    /* ============= MAIN SCREEN ============= */
+    #main-screen {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 50% 30%, #1a1a4e 0%, #0a0a2e 70%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1s ease 0.5s;
+      overflow: hidden;
+    }
+    #main-screen.show { opacity: 1; pointer-events: auto; }
+
+    /* ============= BUBBLES ============= */
+    .bubble {
+      position: absolute; bottom: -100px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.1);
+      animation: bubbleRise linear infinite;
+    }
+
+    /* ============= SPARKLES ============= */
+    .sparkle {
+      position: absolute;
+      width: 4px; height: 4px;
+      background: white; border-radius: 50%;
+      animation: twinkle ease-in-out infinite;
+    }
+
+    /* ============= MOUSE TRAIL CANVAS ============= */
+    #trail-canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 9998; pointer-events: none;
+    }
+
+    /* ============= CAKE SECTION ============= */
+    .cake-section {
+      text-align: center; margin-bottom: 20px;
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.8s, transform 0.8s;
+    }
+    .cake-section.show { opacity: 1; transform: translateY(0); }
+    .cake-emoji {
+      font-size: clamp(60px, 12vw, 100px);
+      display: inline-block;
+      animation: cakeBounce 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255,200,50,0.5));
+    }
+    .cake-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(24px, 5vw, 40px);
+      background: linear-gradient(90deg, #ff6b9d, #ffd93d, #6bcbff);
+      background-size: 200% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 4s linear infinite;
+      margin-top: 5px;
+    }
+    .cake-subtitle {
+      font-size: clamp(13px, 2.5vw, 16px);
+      color: rgba(255,255,255,0.6);
+      margin-top: 5px;
+      opacity: 0;
+      animation: fadeIn 1s ease 2s forwards;
+    }
+
+    /* ============= BILLIARD BALLS ============= */
+    .balls-section {
+      display: flex; gap: clamp(20px, 5vw, 50px);
+      align-items: center; justify-content: center;
+      flex-wrap: wrap; padding: 10px;
+    }
+    .ball-wrapper {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
+      opacity: 0; transform: translateY(60px) scale(0.5);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+    .ball-wrapper.show {
+      opacity: 1; transform: translateY(0) scale(1);
+    }
+    .billiard-ball {
+      width: clamp(100px, 18vw, 140px); height: clamp(100px, 18vw, 140px);
+      border-radius: 50%;
+      position: relative; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.3s, box-shadow 0.3s, filter 0.5s;
+      animation: float 3s ease-in-out infinite;
+    }
+    .billiard-ball::before {
+      content: ''; position: absolute;
+      top: 10%; left: 22%;
+      width: 30%; height: 20%;
+      background: radial-gradient(ellipse, rgba(255,255,255,0.6), transparent);
+      border-radius: 50%; z-index: 2;
+    }
+    .billiard-ball:hover:not(.locked) {
+      transform: scale(1.12) rotateY(15deg);
+    }
+    .billiard-ball:active:not(.locked) { transform: scale(0.95); }
+    .billiard-ball.locked {
+      filter: grayscale(0.7) brightness(0.5);
+      cursor: not-allowed;
+    }
+    .billiard-ball.locked:hover { animation: shake 0.5s; }
+
+    .ball-number {
+      width: clamp(35px, 6vw, 48px); height: clamp(35px, 6vw, 48px);
+      background: white; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(18px, 3.5vw, 26px); font-weight: 900;
+      z-index: 3;
+      border: 2px solid rgba(0,0,0,0.08);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    /* Ball 9 stripe */
+    .ball-9-stripe {
+      position: absolute; top: 28%; left: -2%;
+      width: 104%; height: 44%;
+      background: rgba(255,255,255,0.75);
+      z-index: 1; border-radius: 0;
+    }
+
+    .ball-3 {
+      background: radial-gradient(circle at 30% 30%, #ff8a8a, #e8302a 50%, #8b0000);
+      box-shadow: inset 0 -8px 18px rgba(0,0,0,0.3), 0 8px 25px rgba(232,48,42,0.5),
+                  0 0 40px rgba(232,48,42,0.2);
+    }
+    .ball-3 .ball-number { color: #c0281e; }
+    .ball-3:not(.locked):hover {
+      box-shadow: inset 0 -8px 18px rgba(0,0,0,0.3), 0 8px 35px rgba(232,48,42,0.8),
+                  0 0 60px rgba(255,80,80,0.5);
+    }
+
+    .ball-6 {
+      background: radial-gradient(circle at 30% 30%, #7dd87d, #2d8e2d 50%, #145214);
+      box-shadow: inset 0 -8px 18px rgba(0,0,0,0.3), 0 8px 25px rgba(45,142,45,0.5),
+                  0 0 40px rgba(45,142,45,0.2);
+    }
+    .ball-6 .ball-number { color: #1e6e1e; }
+    .ball-6:not(.locked):hover {
+      box-shadow: inset 0 -8px 18px rgba(0,0,0,0.3), 0 8px 35px rgba(45,142,45,0.8),
+                  0 0 60px rgba(80,200,80,0.5);
+    }
+
+    .ball-9 {
+      background: radial-gradient(circle at 30% 30%, #fff59d, #fdd116 50%, #a88c00);
+      box-shadow: inset 0 -8px 18px rgba(0,0,0,0.3), 0 8px 25px rgba(253,209,22,0.5),
+                  0 0 40px rgba(253,209,22,0.2);
+      overflow: hidden;
+    }
+    .ball-9 .ball-number { color: #8a7400; z-index: 3; }
+    .ball-9:not(.locked):hover {
+      box-shadow: inset 0 -8px 18px rgba(0,0,0,0.3), 0 8px 35px rgba(253,209,22,0.8),
+                  0 0 60px rgba(255,220,50,0.5);
+    }
+
+    .ball-label {
+      font-size: clamp(11px, 2vw, 14px); font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase; letter-spacing: 2px;
+    }
+    .lock-icon {
+      position: absolute; top: -8px; right: -8px;
+      font-size: 22px; z-index: 10;
+      filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .lock-icon.unlocked {
+      opacity: 0; transform: scale(2) rotate(30deg);
+    }
+    .unlock-sparkle {
+      position: absolute; top: 50%; left: 50%;
+      width: 200%; height: 200%;
+      transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 10;
+    }
+
+    /* ============= MODAL BASE ============= */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal-content {
+      position: relative; z-index: 2;
+      max-width: 600px; width: 90%;
+      max-height: 85vh; overflow-y: auto;
+      padding: 40px 30px;
+      border-radius: 24px;
+      transform: scale(0.7) translateY(40px);
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-overlay.show .modal-content {
+      transform: scale(1) translateY(0);
+    }
+    .modal-effects-canvas {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1; pointer-events: none;
+    }
+    .modal-close {
+      position: absolute; top: 15px; right: 20px;
+      background: rgba(255,255,255,0.15); border: none;
+      color: white; font-size: 28px; width: 40px; height: 40px;
+      border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, transform 0.3s;
+      z-index: 5;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+
+    /* ============= MODAL 3 - WISHES ============= */
+    .modal-3-content {
+      background: linear-gradient(135deg, #2d1b3d, #1a1a4e, #2d1b3d);
+      border: 2px solid rgba(255,107,157,0.3);
+      box-shadow: 0 0 60px rgba(255,107,157,0.2), inset 0 0 60px rgba(255,107,157,0.05);
+      text-align: center;
+    }
+    .wish-header {
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(28px, 5vw, 42px);
+      color: #ff6b9d;
+      text-shadow: 0 0 20px rgba(255,107,157,0.5);
+      margin-bottom: 25px;
+    }
+    .wish-text {
+      font-size: clamp(14px, 2.5vw, 17px);
+      line-height: 1.9; color: rgba(255,255,255,0.9);
+      text-align: left; white-space: pre-wrap;
+      min-height: 150px;
+    }
+    .wish-cursor {
+      display: inline-block; width: 2px; height: 1.1em;
+      background: #ff6b9d; margin-left: 2px;
+      animation: blink 0.8s step-end infinite;
+      vertical-align: text-bottom;
+    }
+    .wish-footer {
+      margin-top: 25px; font-size: 40px;
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+
+    /* ============= MODAL 6 - QR CODE ============= */
+    .modal-6-content {
+      background: linear-gradient(135deg, #1a2a1a, #0d1f0d, #1a2a1a);
+      border: 2px solid rgba(255,215,0,0.3);
+      box-shadow: 0 0 60px rgba(255,215,0,0.15), inset 0 0 60px rgba(255,215,0,0.03);
+      text-align: center;
+    }
+    .qr-header {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(24px, 4vw, 36px);
+      color: #ffd700;
+      text-shadow: 0 0 15px rgba(255,215,0,0.5);
+      margin-bottom: 8px;
+    }
+    .qr-subtitle {
+      font-size: clamp(13px, 2.5vw, 16px);
+      color: rgba(255,255,255,0.6); margin-bottom: 25px;
+    }
+    .qr-image-container {
+      display: inline-block; padding: 15px;
+      background: white; border-radius: 16px;
+      box-shadow: 0 0 40px rgba(255,215,0,0.3);
+      animation: glowPulse 2s ease-in-out infinite alternate;
+    }
+    .qr-image-container img {
+      width: clamp(180px, 40vw, 260px); height: auto;
+      display: block; border-radius: 8px;
+    }
+    .qr-placeholder {
+      width: clamp(180px, 40vw, 260px); height: clamp(180px, 40vw, 260px);
+      background: #f0f0f0; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #999; font-size: 14px; text-align: center; padding: 20px;
+    }
+    .qr-note {
+      margin-top: 20px; font-size: clamp(13px, 2.5vw, 16px);
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* ============= MODAL 9 - VIDEO ============= */
+    .modal-9-content {
+      background: linear-gradient(135deg, #0d0d0d, #1a1a2e, #0d0d0d);
+      border: 2px solid rgba(107,203,255,0.3);
+      box-shadow: 0 0 60px rgba(107,203,255,0.15);
+      text-align: center;
+      max-width: 750px;
+    }
+    .video-header {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(24px, 4vw, 36px);
+      color: #6bcbff;
+      text-shadow: 0 0 15px rgba(107,203,255,0.5);
+      margin-bottom: 20px;
+    }
+    .video-container {
+      position: relative; width: 100%;
+      padding-bottom: 56.25%; /* 16:9 */
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 0 30px rgba(107,203,255,0.2);
+      background: #000;
+    }
+    .video-container video,
+    .video-container iframe {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+    .video-placeholder {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      color: #666; font-size: 14px;
+      background: #111;
+    }
+    .cinema-bar {
+      position: absolute; left: 0; width: 100%;
+      height: 0; background: #000; z-index: 3;
+      transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .cinema-bar-top { top: 0; }
+    .cinema-bar-bottom { bottom: 0; }
+    .modal-overlay.show .cinema-bar { height: 0; }
+
+    /* ============= MUSIC TOGGLE ============= */
+    .music-toggle {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 50px; height: 50px;
+      border-radius: 50%; border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      color: white; font-size: 22px;
+      cursor: pointer; z-index: 1500;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+      opacity: 0; pointer-events: none;
+    }
+    .music-toggle.show { opacity: 1; pointer-events: auto; }
+    .music-toggle:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+    .music-toggle.playing { border-color: #ff6b9d; }
+    .music-toggle.playing::after {
+      content: ''; position: absolute;
+      width: 100%; height: 100%; border-radius: 50%;
+      border: 2px solid #ff6b9d;
+      animation: musicRipple 1.5s ease-out infinite;
+    }
+
+    /* ============= HINT ARROW ============= */
+    .hint-arrow {
+      position: absolute;
+      font-size: 30px;
+      animation: hintBounce 1s ease-in-out infinite;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .hint-arrow.show { opacity: 1; }
+
+    /* ============= KEYFRAMES ============= */
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3) translateY(-50px); }
+      50% { transform: scale(1.1) translateY(0); }
+      70% { transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+      100% { box-shadow: 0 0 40px rgba(255,215,0,0.5), 0 0 80px rgba(255,215,0,0.2); }
+    }
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
+    @keyframes confettiFall {
+      0% { opacity: 1; transform: translateY(-10vh) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+    }
+    @keyframes bubbleRise {
+      0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.6; }
+      50% { opacity: 0.4; }
+      100% { transform: translateY(-110vh) translateX(30px) scale(0.3); opacity: 0; }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.5); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px) rotate(-3deg); }
+      40% { transform: translateX(8px) rotate(3deg); }
+      60% { transform: translateX(-6px) rotate(-2deg); }
+      80% { transform: translateX(6px) rotate(2deg); }
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.25); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.15); }
+    }
+    @keyframes cakeBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-8px) rotate(-3deg); }
+      75% { transform: translateY(-5px) rotate(3deg); }
+    }
+    @keyframes musicRipple {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+    @keyframes hintBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes unlockBurst {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    @keyframes rainFall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+    @keyframes heartRise {
+      0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-200px) scale(0.5) rotate(30deg); opacity: 0; }
+    }
+
+    /* ============= NOTIFICATION TOAST ============= */
+    .toast {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+      color: white; padding: 12px 24px;
+      border-radius: 30px; font-size: 14px;
+      z-index: 3000; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ============= YOUTUBE PLAYER (HIDDEN) ============= */
+    #youtube-player-wrapper {
+      position: fixed; bottom: -200px; left: -200px;
+      width: 1px; height: 1px;
+      overflow: hidden; opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ============= RESPONSIVE ============= */
+    @media (max-width: 480px) {
+      .intro-emoji { font-size: 60px; }
+      .open-gift-btn { padding: 14px 35px; }
+      .modal-content { padding: 30px 20px; }
+      .balls-section { gap: 15px; }
+      .music-toggle { width: 42px; height: 42px; font-size: 18px; bottom: 15px; right: 15px; }
+    }
+
+    /* Scrollbar styling for modals */
+    .modal-content::-webkit-scrollbar { width: 6px; }
+    .modal-content::-webkit-scrollbar-track { background: transparent; }
+    .modal-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- ============= INTRO SCREEN ============= -->
+  <div id="intro-screen">
+    <canvas id="fireworks-canvas"></canvas>
+    <div class="intro-content">
+      <div class="intro-emoji">🎂</div>
+      <h1 class="intro-title">Happy Birthday!</h1>
+      <div class="intro-stars">🌟 ✨ 🌟 ✨ 🌟</div>
+      <h2 class="intro-name">Nguyễn Võ Quốc Thái</h2>
+      <button class="open-gift-btn" id="open-gift-btn" onclick="openGift()">
+        Mở quà 🎁
+      </button>
+    </div>
+  </div>
+
+  <!-- ============= MAIN SCREEN ============= -->
+  <div id="main-screen">
+    <!-- Background effects containers (populated by JS) -->
+    <div id="bubbles-container"></div>
+    <div id="sparkles-container"></div>
+
+    <!-- Cake section -->
+    <div class="cake-section" id="cake-section">
+      <div class="cake-emoji">🎂</div>
+      <div class="cake-title">Chúc Mừng Sinh Nhật!</div>
+      <div class="cake-subtitle">Bấm vào các viên bi-da để nhận bất ngờ 🎱</div>
+    </div>
+
+    <!-- Billiard Balls -->
+    <div class="balls-section" id="balls-section">
+      <!-- Ball 3 -->
+      <div class="ball-wrapper" id="ball-wrapper-3">
+        <div class="billiard-ball ball-3" id="ball-3" onclick="onBallClick(3)">
+          <div class="ball-number">3</div>
+        </div>
+        <span class="ball-label">Bất ngờ 1</span>
+      </div>
+      <!-- Ball 6 -->
+      <div class="ball-wrapper" id="ball-wrapper-6">
+        <div class="billiard-ball ball-6 locked" id="ball-6" onclick="onBallClick(6)">
+          <span class="lock-icon" id="lock-6">🔒</span>
+          <div class="ball-number">6</div>
+        </div>
+        <span class="ball-label">Bất ngờ 2</span>
+      </div>
+      <!-- Ball 9 -->
+      <div class="ball-wrapper" id="ball-wrapper-9">
+        <div class="billiard-ball ball-9 locked" id="ball-9" onclick="onBallClick(9)">
+          <span class="lock-icon" id="lock-9">🔒</span>
+          <div class="ball-9-stripe"></div>
+          <div class="ball-number">9</div>
+        </div>
+        <span class="ball-label">Bất ngờ 3</span>
+      </div>
+    </div>
+
+    <!-- Hint arrow -->
+    <div class="hint-arrow" id="hint-arrow">👆</div>
+  </div>
+
+  <!-- ============= MODAL 3 - WISHES ============= -->
+  <div class="modal-overlay" id="modal-3">
+    <canvas class="modal-effects-canvas" id="hearts-canvas"></canvas>
+    <div class="modal-content modal-3-content">
+      <button class="modal-close" onclick="closeModal(3)">✕</button>
+      <div class="wish-header">💌 Lời Chúc Đặc Biệt</div>
+      <div class="wish-text" id="wish-text"></div>
+      <div class="wish-footer" id="wish-footer" style="display:none;">💖</div>
+    </div>
+  </div>
+
+  <!-- ============= MODAL 6 - QR CODE ============= -->
+  <div class="modal-overlay" id="modal-6">
+    <canvas class="modal-effects-canvas" id="money-canvas"></canvas>
+    <div class="modal-content modal-6-content">
+      <button class="modal-close" onclick="closeModal(6)">✕</button>
+      <div class="qr-header">🎁 Quà Nhỏ Cho Ngày Đặc Biệt</div>
+      <div class="qr-subtitle">Một chút tấm lòng gửi đến bạn ❤️</div>
+      <div class="qr-image-container">
+        <!-- Thay thế bằng ảnh QR code thực tế -->
+        <img src="assets/qrcode.png" alt="QR Code" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="qr-placeholder" style="display:none;">
+          📱 Thay ảnh QR code<br>vào file<br>assets/qrcode.png
+        </div>
+      </div>
+      <div class="qr-note">Quét mã QR để nhận quà nha! 🤑</div>
+    </div>
+  </div>
+
+  <!-- ============= MODAL 9 - VIDEO ============= -->
+  <div class="modal-overlay" id="modal-9">
+    <div class="modal-content modal-9-content">
+      <button class="modal-close" onclick="closeModal(9)">✕</button>
+      <div class="video-header">🎬 Dành Riêng Cho Bạn</div>
+      <div class="video-container" id="video-container">
+        <div class="cinema-bar cinema-bar-top"></div>
+        <div class="cinema-bar cinema-bar-bottom"></div>
+        <!-- Thay thế bằng video thực tế -->
+        <video id="surprise-video" controls>
+          <source src="assets/video.mp4" type="video/mp4">
+        </video>
+        <div class="video-placeholder" id="video-placeholder">
+          🎬 Thay video vào file<br>assets/video.mp4
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= TOAST NOTIFICATION ============= -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ============= MUSIC TOGGLE ============= -->
+  <button class="music-toggle" id="music-toggle" onclick="toggleMusic()">🎵</button>
+
+  <!-- ============= YOUTUBE PLAYER (HIDDEN) ============= -->
+  <div id="youtube-player-wrapper">
+    <div id="youtube-player"></div>
+  </div>
+
+  <!-- ============= MOUSE/TOUCH TRAIL ============= -->
+  <canvas id="trail-canvas"></canvas>
+
+  <!-- ============= JAVASCRIPT ============= -->
+  <script>
+    // ===================================================================
+    // CONFIGURATION - Dễ dàng chỉnh sửa
+    // ===================================================================
+    const CONFIG = {
+      name: 'Nguyễn Võ Quốc Thái',
+      nickname: 'Thái',
+      youtubeVideoId: 'Wu8NeFXaoOc',
+      // Lời chúc sinh nhật - Chỉnh sửa tại đây
+      wishMessage: `Gửi đến ${'"'}Quốc Thái${'"'} thân mến,\n\nChúc mừng sinh nhật bạn! 🎂\n\nMột năm mới lại đến, chúc bạn luôn mạnh khỏe, vui vẻ và gặp nhiều may mắn trong cuộc sống.\n\nCảm ơn bạn vì đã luôn là một người bạn tuyệt vời! Cuộc đời có bạn thật sự ý nghĩa hơn rất nhiều.\n\nChúc bạn thật nhiều sức khỏe, hạnh phúc và thành công! Mong mọi điều tốt đẹp nhất sẽ đến với bạn! 💖\n\nThương mến,\nNgười bạn của bạn ❤️`,
+    };
+
+    // ===================================================================
+    // STATE
+    // ===================================================================
+    const state = {
+      step: 0,        // 0=intro, 1=main, 2=ball3done, 3=ball6done, 4=ball9done
+      musicPlaying: false,
+      ytPlayer: null,
+      ytReady: false,
+      fireworksRunning: true,
+      trailParticles: [],
+    };
+
+    // ===================================================================
+    // FIREWORKS (Canvas on Intro)
+    // ===================================================================
+    const fwCanvas = document.getElementById('fireworks-canvas');
+    const fwCtx = fwCanvas.getContext('2d');
+    let fireworks = [];
+    let fwAnimId;
+
+    function resizeFireworks() {
+      fwCanvas.width = window.innerWidth;
+      fwCanvas.height = window.innerHeight;
+    }
+
+    class FWParticle {
+      constructor(x, y, color) {
+        this.x = x; this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1 + Math.random() * 5;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = 0.008 + Math.random() * 0.015;
+        this.size = 1.5 + Math.random() * 1.5;
+      }
+      update() {
+        this.vx *= 0.98; this.vy *= 0.98;
+        this.vy += 0.04;
+        this.x += this.vx; this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class FWRocket {
+      constructor(canvas) {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height;
+        this.targetY = 80 + Math.random() * (canvas.height * 0.4);
+        this.speed = 4 + Math.random() * 3;
+        this.hue = Math.random() * 360;
+        this.particles = [];
+        this.exploded = false;
+        this.trail = [];
+      }
+      update() {
+        if (!this.exploded) {
+          this.trail.push({x: this.x, y: this.y});
+          if (this.trail.length > 6) this.trail.shift();
+          this.y -= this.speed;
+          if (this.y <= this.targetY) this.explode();
+        } else {
+          for (let p of this.particles) p.update();
+          this.particles = this.particles.filter(p => p.alpha > 0);
+        }
+      }
+      explode() {
+        this.exploded = true;
+        const count = 60 + Math.floor(Math.random() * 50);
+        for (let i = 0; i < count; i++) {
+          const h = this.hue + Math.random() * 30 - 15;
+          this.particles.push(new FWParticle(this.x, this.y, `hsl(${h},100%,60%)`));
+        }
+      }
+      draw(ctx) {
+        if (!this.exploded) {
+          for (let i = 0; i < this.trail.length; i++) {
+            ctx.beginPath();
+            ctx.arc(this.trail[i].x, this.trail[i].y, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255,255,200,${i / this.trail.length * 0.7})`;
+            ctx.fill();
+          }
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `hsl(${this.hue},100%,70%)`;
+          ctx.fill();
+        } else {
+          for (let p of this.particles) p.draw(ctx);
+        }
+      }
+      isDead() { return this.exploded && this.particles.length === 0; }
+    }
+
+    function animateFireworks() {
+      fwCtx.fillStyle = 'rgba(10,10,46,0.15)';
+      fwCtx.fillRect(0, 0, fwCanvas.width, fwCanvas.height);
+      if (Math.random() < 0.06 && fireworks.length < 8) {
+        fireworks.push(new FWRocket(fwCanvas));
+      }
+      for (let fw of fireworks) { fw.update(); fw.draw(fwCtx); }
+      fireworks = fireworks.filter(fw => !fw.isDead());
+      if (state.fireworksRunning) fwAnimId = requestAnimationFrame(animateFireworks);
+    }
+
+    // ===================================================================
+    // CONFETTI (CSS-based)
+    // ===================================================================
+    function spawnConfetti(count = 60, container = document.body) {
+      const colors = ['#ff6b9d','#ffd93d','#6bcbff','#c44dff','#ff9a3c','#4dff88','#ff4d6d'];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random() * 100 + '%';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.width = (6 + Math.random() * 8) + 'px';
+        el.style.height = (6 + Math.random() * 8) + 'px';
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        el.style.animationDuration = (3 + Math.random() * 4) + 's';
+        el.style.animationDelay = (Math.random() * 3) + 's';
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 8000);
+      }
+    }
+
+    // ===================================================================
+    // BUBBLES (CSS-based on Main Screen)
+    // ===================================================================
+    function createBubbles() {
+      const container = document.getElementById('bubbles-container');
+      for (let i = 0; i < 20; i++) {
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        const size = 15 + Math.random() * 40;
+        b.style.width = size + 'px';
+        b.style.height = size + 'px';
+        b.style.left = Math.random() * 100 + '%';
+        b.style.animationDuration = (6 + Math.random() * 10) + 's';
+        b.style.animationDelay = (Math.random() * 8) + 's';
+        container.appendChild(b);
+      }
+    }
+
+    // ===================================================================
+    // SPARKLES (CSS-based on Main Screen)
+    // ===================================================================
+    function createSparkles() {
+      const container = document.getElementById('sparkles-container');
+      for (let i = 0; i < 35; i++) {
+        const s = document.createElement('div');
+        s.className = 'sparkle';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        s.style.animationDelay = (Math.random() * 3) + 's';
+        s.style.background = ['#fff','#ffd93d','#ff6b9d','#6bcbff'][Math.floor(Math.random()*4)];
+        container.appendChild(s);
+      }
+    }
+
+    // ===================================================================
+    // MOUSE / TOUCH GLITTER TRAIL
+    // ===================================================================
+    const trailCanvas = document.getElementById('trail-canvas');
+    const trailCtx = trailCanvas.getContext('2d');
+
+    function resizeTrail() {
+      trailCanvas.width = window.innerWidth;
+      trailCanvas.height = window.innerHeight;
+    }
+
+    class TrailParticle {
+      constructor(x, y) {
+        this.x = x; this.y = y;
+        this.vx = (Math.random() - 0.5) * 3;
+        this.vy = (Math.random() - 0.5) * 3 - 1;
+        this.alpha = 1;
+        this.size = 1 + Math.random() * 3;
+        this.hue = Math.random() * 60 + 30; // gold-ish
+        this.decay = 0.02 + Math.random() * 0.02;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.03;
+        this.alpha -= this.decay;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function animateTrail() {
+      trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      for (let p of state.trailParticles) {
+        p.update();
+        p.draw(trailCtx);
+      }
+      state.trailParticles = state.trailParticles.filter(p => p.alpha > 0);
+      requestAnimationFrame(animateTrail);
+    }
+
+    function onPointerMove(e) {
+      const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      if (x && y) {
+        for (let i = 0; i < 3; i++) {
+          state.trailParticles.push(new TrailParticle(x, y));
+        }
+        // Keep particle count reasonable
+        if (state.trailParticles.length > 200) {
+          state.trailParticles = state.trailParticles.slice(-150);
+        }
+      }
+    }
+
+    // ===================================================================
+    // FLOATING EMOJI EFFECTS
+    // ===================================================================
+    function spawnFloatingEmojis(emojis, count, container, animName, duration) {
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.cssText = `
+          position: fixed; z-index: 2001;
+          left: ${Math.random() * 100}%;
+          font-size: ${16 + Math.random() * 24}px;
+          pointer-events: none;
+          animation: ${animName} ${duration + Math.random() * 2}s linear forwards;
+          animation-delay: ${Math.random() * 2}s;
+          opacity: 0;
+        `;
+        // Add animation start opacity
+        el.style.animationFillMode = 'forwards';
+        container.appendChild(el);
+        setTimeout(() => el.remove(), (duration + 4) * 1000);
+      }
+    }
+
+    // ===================================================================
+    // HEARTS (for Ball 3 modal)
+    // ===================================================================
+    let heartsAnimId;
+    let heartParticles = [];
+
+    function startHearts() {
+      const canvas = document.getElementById('hearts-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      heartParticles = [];
+
+      function addHeart() {
+        heartParticles.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height + 20,
+          size: 10 + Math.random() * 16,
+          speed: 1 + Math.random() * 2,
+          wobble: Math.random() * Math.PI * 2,
+          wobbleSpeed: 0.02 + Math.random() * 0.03,
+          alpha: 0.4 + Math.random() * 0.5,
+          color: ['#ff6b9d','#ff4d6d','#ff85a2','#ff3366','#e91e63'][Math.floor(Math.random()*5)],
+        });
+      }
+
+      function drawHeart(ctx, x, y, size, color, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.font = size + 'px serif';
+        ctx.fillText('❤', x - size/2, y);
+        ctx.restore();
+      }
+
+      function animateHearts() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (Math.random() < 0.15) addHeart();
+        for (let h of heartParticles) {
+          h.y -= h.speed;
+          h.wobble += h.wobbleSpeed;
+          h.x += Math.sin(h.wobble) * 1.5;
+          h.alpha -= 0.002;
+          drawHeart(ctx, h.x, h.y, h.size, h.color, h.alpha);
+        }
+        heartParticles = heartParticles.filter(h => h.alpha > 0 && h.y > -30);
+        heartsAnimId = requestAnimationFrame(animateHearts);
+      }
+      animateHearts();
+    }
+
+    function stopHearts() {
+      cancelAnimationFrame(heartsAnimId);
+      heartParticles = [];
+    }
+
+    // ===================================================================
+    // MONEY RAIN (for Ball 6 modal)
+    // ===================================================================
+    let moneyAnimId;
+    let moneyParticles = [];
+
+    function startMoneyRain() {
+      const canvas = document.getElementById('money-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      moneyParticles = [];
+
+      function addMoney() {
+        const emojis = ['💵','💰','💸','🤑','💲','🪙'];
+        moneyParticles.push({
+          x: Math.random() * canvas.width,
+          y: -30,
+          size: 16 + Math.random() * 20,
+          speed: 2 + Math.random() * 3,
+          wobble: Math.random() * Math.PI * 2,
+          wobbleSpeed: 0.02 + Math.random() * 0.03,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: 0.02 + Math.random() * 0.04,
+          emoji: emojis[Math.floor(Math.random() * emojis.length)],
+          alpha: 0.7 + Math.random() * 0.3,
+        });
+      }
+
+      function animateMoney() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (Math.random() < 0.2) addMoney();
+        for (let m of moneyParticles) {
+          m.y += m.speed;
+          m.wobble += m.wobbleSpeed;
+          m.x += Math.sin(m.wobble) * 1.5;
+          m.rotation += m.rotSpeed;
+          ctx.save();
+          ctx.globalAlpha = m.alpha;
+          ctx.translate(m.x, m.y);
+          ctx.rotate(m.rotation);
+          ctx.font = m.size + 'px serif';
+          ctx.fillText(m.emoji, -m.size/2, m.size/2);
+          ctx.restore();
+        }
+        moneyParticles = moneyParticles.filter(m => m.y < canvas.height + 50);
+        moneyAnimId = requestAnimationFrame(animateMoney);
+      }
+      animateMoney();
+    }
+
+    function stopMoneyRain() {
+      cancelAnimationFrame(moneyAnimId);
+      moneyParticles = [];
+    }
+
+    // ===================================================================
+    // TYPEWRITER EFFECT
+    // ===================================================================
+    function typeWriter(element, text, speed = 30) {
+      return new Promise(resolve => {
+        let i = 0;
+        element.innerHTML = '';
+        const cursor = document.createElement('span');
+        cursor.className = 'wish-cursor';
+        element.appendChild(cursor);
+
+        function type() {
+          if (i < text.length) {
+            cursor.insertAdjacentText('beforebegin', text.charAt(i));
+            i++;
+            setTimeout(type, text.charAt(i-1) === '\n' ? speed * 5 : speed);
+          } else {
+            setTimeout(() => {
+              cursor.remove();
+              resolve();
+            }, 500);
+          }
+        }
+        setTimeout(type, 600);
+      });
+    }
+
+    // ===================================================================
+    // TOAST NOTIFICATION
+    // ===================================================================
+    let toastTimeout;
+    function showToast(message, duration = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    // ===================================================================
+    // YOUTUBE MUSIC PLAYER
+    // ===================================================================
+    function loadYouTubeAPI() {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+
+    // Global callback for YouTube API
+    window.onYouTubeIframeAPIReady = function() {
+      state.ytPlayer = new YT.Player('youtube-player', {
+        height: '1', width: '1',
+        videoId: CONFIG.youtubeVideoId,
+        playerVars: {
+          autoplay: 0, loop: 1,
+          playlist: CONFIG.youtubeVideoId,
+          controls: 0, disablekb: 1,
+          fs: 0, modestbranding: 1,
+        },
+        events: {
+          onReady: () => { state.ytReady = true; },
+          onStateChange: (e) => {
+            state.musicPlaying = (e.data === YT.PlayerState.PLAYING);
+            updateMusicBtn();
+          }
+        }
+      });
+    };
+
+    function playMusic() {
+      if (state.ytReady && state.ytPlayer) {
+        state.ytPlayer.playVideo();
+        state.musicPlaying = true;
+        updateMusicBtn();
+      }
+    }
+
+    function pauseMusic() {
+      if (state.ytReady && state.ytPlayer) {
+        state.ytPlayer.pauseVideo();
+        state.musicPlaying = false;
+        updateMusicBtn();
+      }
+    }
+
+    function toggleMusic() {
+      if (state.musicPlaying) pauseMusic();
+      else playMusic();
+    }
+
+    function updateMusicBtn() {
+      const btn = document.getElementById('music-toggle');
+      btn.textContent = state.musicPlaying ? '🎵' : '🔇';
+      btn.classList.toggle('playing', state.musicPlaying);
+    }
+
+    // ===================================================================
+    // BALL INTERACTIONS
+    // ===================================================================
+    function onBallClick(num) {
+      const ball = document.getElementById('ball-' + num);
+
+      // Check if locked
+      if (ball.classList.contains('locked')) {
+        ball.style.animation = 'shake 0.5s';
+        setTimeout(() => ball.style.animation = `float 3s ease-in-out infinite`, 500);
+        showToast('🔒 Hãy mở bất ngờ trước đó!');
+        return;
+      }
+
+      // Check sequential order
+      if (num === 3 && state.step < 1) return; // shouldn't happen, ball 3 is unlocked by default
+      if (num === 6 && state.step < 2) {
+        showToast('🔒 Hãy mở bất ngờ số 3 trước!');
+        return;
+      }
+      if (num === 9 && state.step < 3) {
+        showToast('🔒 Hãy mở bất ngờ số 6 trước!');
+        return;
+      }
+
+      // Open modal
+      openModal(num);
+    }
+
+    function openModal(num) {
+      const overlay = document.getElementById('modal-' + num);
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+
+      if (num === 3) {
+        startHearts();
+        const wishEl = document.getElementById('wish-text');
+        typeWriter(wishEl, CONFIG.wishMessage, 28).then(() => {
+          document.getElementById('wish-footer').style.display = 'block';
+        });
+        spawnConfetti(30, overlay);
+      } else if (num === 6) {
+        startMoneyRain();
+      } else if (num === 9) {
+        // Try to play video
+        const video = document.getElementById('surprise-video');
+        const placeholder = document.getElementById('video-placeholder');
+        video.addEventListener('error', () => {
+          placeholder.style.display = 'flex';
+        });
+        video.play().catch(() => {});
+      }
+    }
+
+    function closeModal(num) {
+      const overlay = document.getElementById('modal-' + num);
+      overlay.classList.remove('show');
+      document.body.style.overflow = 'hidden';
+
+      if (num === 3) {
+        stopHearts();
+        state.step = 2;
+        unlockBall(6);
+      } else if (num === 6) {
+        stopMoneyRain();
+        state.step = 3;
+        unlockBall(9);
+      } else if (num === 9) {
+        const video = document.getElementById('surprise-video');
+        video.pause();
+        state.step = 4;
+        showToast('🎉 Hết bất ngờ rồi! Chúc bạn sinh nhật vui vẻ! 🎂', 5000);
+        // Final celebration
+        setTimeout(() => {
+          spawnConfetti(100);
+          launchFinalFireworks();
+        }, 500);
+      }
+    }
+
+    function unlockBall(num) {
+      const ball = document.getElementById('ball-' + num);
+      const lock = document.getElementById('lock-' + num);
+
+      // Unlock animation
+      setTimeout(() => {
+        lock.classList.add('unlocked');
+        ball.classList.remove('locked');
+
+        // Burst effect
+        showToast(num === 6 ? '🔓 Bất ngờ thứ 2 đã mở khóa!' : '🔓 Bất ngờ cuối cùng đã mở khóa!');
+
+        // Spawn sparkles around the ball
+        for (let i = 0; i < 12; i++) {
+          const sparkle = document.createElement('div');
+          sparkle.style.cssText = `
+            position: absolute;
+            width: 8px; height: 8px;
+            background: ${num === 6 ? '#ffd700' : '#6bcbff'};
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            z-index: 10;
+            pointer-events: none;
+            animation: unlockBurst 0.8s ease-out forwards;
+            animation-delay: ${i * 0.05}s;
+            transform-origin: center;
+          `;
+          const angle = (Math.PI * 2 / 12) * i;
+          const dist = 80;
+          sparkle.style.marginLeft = (Math.cos(angle) * dist) + 'px';
+          sparkle.style.marginTop = (Math.sin(angle) * dist) + 'px';
+          ball.parentElement.appendChild(sparkle);
+          setTimeout(() => sparkle.remove(), 1500);
+        }
+
+        // Update hint arrow
+        positionHintArrow(num);
+      }, 600);
+    }
+
+    function positionHintArrow(ballNum) {
+      const hint = document.getElementById('hint-arrow');
+      const wrapper = document.getElementById('ball-wrapper-' + ballNum);
+      if (wrapper) {
+        const rect = wrapper.getBoundingClientRect();
+        hint.style.left = (rect.left + rect.width / 2 - 15) + 'px';
+        hint.style.top = (rect.top - 40) + 'px';
+        hint.classList.add('show');
+        setTimeout(() => hint.classList.remove('show'), 4000);
+      }
+    }
+
+    // ===================================================================
+    // FINAL FIREWORKS (celebration after all surprises)
+    // ===================================================================
+    function launchFinalFireworks() {
+      const canvas = document.createElement('canvas');
+      canvas.style.cssText = `
+        position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 9000; pointer-events: none;
+      `;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      let fws = [];
+      let frame = 0;
+
+      function animate() {
+        ctx.fillStyle = 'rgba(0,0,0,0.12)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        if (frame % 8 === 0 && fws.length < 10) {
+          fws.push(new FWRocket(canvas));
+        }
+        for (let fw of fws) { fw.update(); fw.draw(ctx); }
+        fws = fws.filter(fw => !fw.isDead());
+        frame++;
+        if (frame < 300) {
+          requestAnimationFrame(animate);
+        } else {
+          setTimeout(() => canvas.remove(), 2000);
+        }
+      }
+      animate();
+    }
+
+    // ===================================================================
+    // OPEN GIFT (transition from intro to main)
+    // ===================================================================
+    function openGift() {
+      const btn = document.getElementById('open-gift-btn');
+      btn.disabled = true;
+      btn.textContent = '✨ Đang mở... ✨';
+
+      // Extra confetti burst
+      spawnConfetti(80);
+
+      // Extra fireworks
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => fireworks.push(new FWRocket(fwCanvas)), i * 200);
+      }
+
+      // Start transition after a brief pause
+      setTimeout(() => {
+        // Hide intro
+        document.getElementById('intro-screen').classList.add('hide');
+        state.fireworksRunning = false;
+
+        // Show main screen
+        const main = document.getElementById('main-screen');
+        main.classList.add('show');
+
+        // Play music
+        setTimeout(playMusic, 500);
+
+        // Show music toggle
+        document.getElementById('music-toggle').classList.add('show');
+
+        // Animate elements in sequence
+        setTimeout(() => {
+          document.getElementById('cake-section').classList.add('show');
+        }, 500);
+
+        // Show balls sequentially
+        setTimeout(() => {
+          document.getElementById('ball-wrapper-3').classList.add('show');
+        }, 1000);
+        setTimeout(() => {
+          document.getElementById('ball-wrapper-6').classList.add('show');
+        }, 1400);
+        setTimeout(() => {
+          document.getElementById('ball-wrapper-9').classList.add('show');
+        }, 1800);
+
+        // Show hint arrow on ball 3
+        setTimeout(() => {
+          positionHintArrow(3);
+        }, 2500);
+
+        // Spawn confetti on main screen too
+        setTimeout(() => spawnConfetti(40), 1200);
+
+        state.step = 1;
+      }, 1200);
+    }
+
+    // ===================================================================
+    // INITIALIZATION
+    // ===================================================================
+    function init() {
+      // Resize canvases
+      resizeFireworks();
+      resizeTrail();
+      window.addEventListener('resize', () => {
+        resizeFireworks();
+        resizeTrail();
+      });
+
+      // Start fireworks on intro
+      animateFireworks();
+
+      // Start mouse trail
+      animateTrail();
+      document.addEventListener('mousemove', onPointerMove);
+      document.addEventListener('touchmove', onPointerMove, {passive: true});
+
+      // Create background effects for main screen
+      createBubbles();
+      createSparkles();
+
+      // Initial confetti on intro
+      setTimeout(() => spawnConfetti(30), 1000);
+
+      // Load YouTube API
+      loadYouTubeAPI();
+
+      // Check if video file exists
+      const video = document.getElementById('surprise-video');
+      video.addEventListener('canplay', () => {
+        document.getElementById('video-placeholder').style.display = 'none';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
