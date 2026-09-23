@@ -1124,6 +1124,21 @@
       drawMatrix(); animTrail();
       runBoot();
 
+      // Show music toggle right away
+      document.getElementById('music-toggle').classList.add('show');
+      
+      // Attempt autoplay
+      playMusic();
+      
+      // Fallback: play on first interaction if autoplay is blocked
+      const startAudio = () => {
+        if (!S.musicOn) playMusic();
+        document.removeEventListener('click', startAudio);
+        document.removeEventListener('keydown', startAudio);
+      };
+      document.addEventListener('click', startAudio);
+      document.addEventListener('keydown', startAudio);
+
       const video = document.getElementById('surprise-video');
       video.addEventListener('canplay', () => {
         document.getElementById('video-placeholder').style.display = 'none';
