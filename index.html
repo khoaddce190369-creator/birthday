@@ -662,7 +662,7 @@
     // ================================================================
     const S = {
       step: 0, musicOn: false, ytPlayer: null, ytReady: false,
-      trailParts: [], uptimeSec: 0,
+      trailParts: [], uptimeSec: 0, wasMusicOn: false,
     };
 
     // ================================================================
@@ -1015,6 +1015,7 @@
         await typeWriter(wishEl, CONFIG.wish, 22);
         document.getElementById('wish-footer').style.display = 'block';
       } else if (num === 6) {
+        if (S.musicOn) { S.wasMusicOn = true; pauseMusic(); } else { S.wasMusicOn = false; }
         await showDecryptAnim(6, 'secret_video.enc');
         const video = document.getElementById('surprise-video');
         video.addEventListener('error', () => {
@@ -1032,6 +1033,7 @@
       if (num === 3) { stopHearts(); S.step = 2; unlockBall(6); }
       else if (num === 6) {
         document.getElementById('surprise-video').pause();
+        if (S.wasMusicOn) playMusic();
         S.step = 3; unlockBall(9);
       }
       else if (num === 9) {
